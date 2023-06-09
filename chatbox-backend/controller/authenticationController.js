@@ -7,7 +7,7 @@ const generateToken = (userId) => {
     const payload = { userId };
   
     // Generate the JWT with the payload and a secret key
-    const token = jwt.sign(payload, 'your-secret-key', { expiresIn: '1h' });
+    const token = jwt.sign(payload, 'b869f679a73147f77441856aa30fdac8b83bfe7d7c2c3c755f314959918a632029ed49ea450911c234ba1832570dc753e231a75d2277124b844cd3a4f9f6d3bd', { expiresIn: '1h' });
   
     return token;
   };
@@ -75,7 +75,7 @@ exports.login = async (req, res, next) => {
     // Generate a JWT token for the authenticated user
     const token = jwt.sign(
       { userId: user[0].id, email: user[0].email },
-      "your-secret-key", // Replace with your own secret key for signing the token
+      "b869f679a73147f77441856aa30fdac8b83bfe7d7c2c3c755f314959918a632029ed49ea450911c234ba1832570dc753e231a75d2277124b844cd3a4f9f6d3bd", // Replace with your own secret key for signing the token
       { expiresIn: "1h" } // Set the token expiration time as per your requirement
     );
 
