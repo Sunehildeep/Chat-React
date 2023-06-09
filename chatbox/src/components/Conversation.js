@@ -1,20 +1,30 @@
 import React, { useEffect, useState } from "react";
 import "../styles/conversation.css";
-import { getConversationHistory, postMessage } from "../actions/conversations";
+import { getConversationHistory, postMessage, startConvo } from "../actions/conversationActions";
 import Messages from "./Messages";
 import { useSelector } from "react-redux";
-import { io } from "socket.io-client";
 
-const Conversation = ({ selectedConversation }) => {
+const Conversation = ({ selectedConversation, socket }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const currentUser = useSelector((state) => state.authentication?.user?.name);
   const currentId = useSelector((state) => state.authentication?.user?.id);
+  const [isNewConversation, setIsNewConversation] = useState(false);
   const [message, setMessage] = useState("");
-  const socket = io('http://localhost:8000');
+
 
   useEffect(() => {
     getConvo();
+    setupWebSocket();
+
+    // Cleanup WebSocket connection when the component unmounts
+    return () => {
+        // remove the event listener
+        socket.off("message");
+        socket.off("connect");
+        socket.emit("leaveRoom", selectedConversation.id);
+        console.log("Left room:", selectedConversation.id);
+    };
   }, []);
 
   useEffect(() => {
@@ -23,48 +33,53 @@ const Conversation = ({ selectedConversation }) => {
     convoBody.scrollTop = convoBody.scrollHeight;
   }, [messages, loading]);
 
-  useEffect(() => {
-    setupWebSocket();
-    // Cleanup WebSocket connection when the component unmounts
-    return () => {
-      if (socket) {
-        // rmeove the event listener
-        socket.off("message");
-        socket.off("connect");
-        socket.emit("leaveRoom", selectedConversation.id);
-        // also remove from the room
-      }
-    };
-  }, []); // Empty dependency array to ensure it's called only once
-
   const getConvo = async () => {
-    const history = await getConversationHistory(selectedConversation.id);
-    console.log("Conversation history:", history);
-    setMessages(history);
+    if(selectedConversation?.userId) {
+      // It means it is a new conversation
+      setIsNewConversation(true);
+    }
+    else {
+      const history = await getConversationHistory(selectedConversation.id);
+      setMessages(history);
+    }
     setLoading(false);
   };
 
   const setupWebSocket = () => {
+    if(!selectedConversation.id) return;
 
-    socket.connect();
+    socket.emit("joinRoom", selectedConversation.id);
+    console.log("Joined room:", selectedConversation.id);
 
-    socket.on("connect", () => {
-      console.log("WebSocket connection established");
-      socket.emit("joinRoom", selectedConversation.id);
-    });
-
+    
     socket.on("message", (receivedMessage) => {
       console.log("Message received from server:", receivedMessage);
       setMessages((prevMessages) => [...prevMessages, receivedMessage]);
     });
 
+
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!socket || socket.disconnected) {
       console.log("WebSocket connection is not open");
       return;
     }
+
+    if(isNewConversation) {
+      setIsNewConversation(false);
+
+      const convoId = await startConvo(currentId, selectedConversation.userId, message);
+      selectedConversation.id = convoId;
+
+      selectedConversation.user1 = currentId;
+      selectedConversation.user2 = selectedConversation.userId;
+
+      delete selectedConversation.userId;
+
+      setupWebSocket();
+    }
+
     const newMessage = {
       name: currentUser,
       message: message,
@@ -72,7 +87,9 @@ const Conversation = ({ selectedConversation }) => {
       roomId: selectedConversation.id,
     };
 
-    postMessage(selectedConversation.id, currentId, message);
+    await postMessage(selectedConversation.id, currentId, message);
+
+    socket.emit("refresh",selectedConversation.user1, selectedConversation.user2 );
 
     socket.emit("message", newMessage);
     setMessage("");

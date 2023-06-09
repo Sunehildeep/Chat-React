@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import thunkMiddleware from "redux-thunk";
-import { authenticationReducer } from "./reducers/authentication";
+import { authenticationReducer } from "./reducers/authenticationReducer";
 
 const saveStateToLocalStorage = (state) => {
   try {

@@ -1,16 +1,18 @@
 import { React, useEffect, useState } from 'react'
 import '../styles/chatbox.css'
-import '../styles/convobanner.css';
 import ConvoBanner from '../components/ConvoBanner';
 import Conversation from '../components/Conversation';
-import { getConversationsList, getAllUsers } from '../actions/conversations';
+import { getConversationsList, getAllUsers } from '../actions/conversationActions';
 import { useSelector } from 'react-redux';
-import { isAuthenticated } from '../actions/authentication';
+import { isAuthenticated } from '../actions/authenticationActions';
+
 const Chatbox = ({socket}) => {
     const [selectedConversation, setSelectedConversation] = useState(null); 
     const [conversations, setConversations] = useState();
     const [loading, setLoading] = useState(true);
-    const [users, setUsers] = useState([]);
+    const [search, setSearch] = useState('');
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [info, setInfo] = useState('Start a conversation by searching for a user');
     const userId = useSelector((state) => state.authentication?.user?.id);
 
     if (!isAuthenticated()) {
@@ -22,14 +24,31 @@ const Chatbox = ({socket}) => {
     };
 
     useEffect(() => {
+
+        // connectId
+        socket.emit('connectId', userId);
+
+        // If socket emits refresh from backend, refresh the conversations list
+        socket.on('refresh', () => {
+            console.log('Refreshing conversations list');
+            loadConversations(userId);
+        });
+
         loadConversations(userId);
-        loadUsers();
+
+        return () => {
+            socket.off('refresh');
+        }
+
     }, []);
 
     const loadConversations = async (userId) => {
         try {
             const convos = await getConversationsList(userId);
+            console.log("Time is :", new Date().toLocaleTimeString());
+            console.log(convos);
             setConversations(convos);
+            setFilteredUsers(convos)
             setLoading(false);
         }
         catch (error) {
@@ -40,11 +59,49 @@ const Chatbox = ({socket}) => {
     const loadUsers = async () => {
         try {
             const users = await getAllUsers();
-            setUsers(users);
+            return users;
         }
         catch (error) {
             console.log(error)
         }
+    }
+
+    const searchForUser = async (event) => {
+
+        if (event.key != 'Enter')  return;
+        if (search == '') {
+            setFilteredUsers(conversations);
+            setInfo(conversations.length == 0 ? 'Start a conversation by searching for a user' : '');
+            return;
+        } 
+
+        const users = await loadUsers();
+        const filteredUsers = users.filter((user) => {
+            // Filter out the current user
+            if (user.userId == userId) return false;
+
+            return user.name.toLowerCase().includes(search.toLowerCase());
+        });
+
+        if(filteredUsers.length == 0) setInfo('No results found')
+        else setInfo('');
+
+        console.log(filteredUsers);
+
+        // Check if the userId in filteredUsers is in conversations.user1 or conversations.user2
+        // If it is, then replace that index in filteredUsers with the conversation object
+        for (let i = 0; i < filteredUsers.length; i++) {
+            const user = filteredUsers[i];
+            const conversation = conversations.find((conversation) => {
+                return conversation.user1 == user.userId || conversation.user2 == user.userId;
+            });
+
+            if (conversation) {
+                filteredUsers[i] = conversation;
+            }
+        }
+
+        setFilteredUsers(filteredUsers);
     }
 
     if (loading) {
@@ -57,22 +114,20 @@ const Chatbox = ({socket}) => {
                 <h2>
                     Conversations
                 </h2>
+
                 <div className="search-box">
-                    <input type="text" className="search-input" placeholder="Search for people..." />
+                    <input type="text" className="search-input" placeholder="Search for people..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => searchForUser(e)}/>
                 </div>
                 <div className="past-convos">
                     {/* Past conversations go here */}
                     {
-                        conversations.map((conversation) => (
+                        filteredUsers.length > 0 ? filteredUsers.map((conversation, index) => (
                             <ConvoBanner
-                                key={conversation.id}
+                                key={conversation.id ? conversation.id : conversation.userId}
                                 onClick={handleConversationClick}
-                                name={conversation.name}
-                                avatar={conversation.avatar}
-                                lastMessage={conversation.last_message}
-                                id={conversation.id}
+                                convo={conversation}
                             />
-                        ))
+                        )) : <div className="sidebar-info">{info}</div>
                     }
                 </div>
             </div>

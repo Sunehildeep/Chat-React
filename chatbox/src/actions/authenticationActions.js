@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { loginSuccess, loginFailure, registerSuccess, registerFailure } from '../reducers/authentication';
+import { loginSuccess, loginFailure, registerSuccess, registerFailure } from '../reducers/authenticationReducer';
 import { useSelector } from 'react-redux';
 
 export const login = (email, password) => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/authentication.css';
 import { connect, useSelector } from 'react-redux';
-import { isAuthenticated, login, register } from '../actions/authentication';
+import { isAuthenticated, login, register } from '../actions/authenticationActions';
 
 const Authentication = ({ loginAction, registerAction }) => {
   const [name, setName] = useState('');

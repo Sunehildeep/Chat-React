@@ -47,7 +47,7 @@ const Messages = ({ messages, currentUser }) => {
           >
             {showSender && (
               <div className={`${message.name === currentUser ? 'sender' : 'receiver'}`}>
-                {message.name}
+                {message.name === currentUser ? 'You' : message.name}
               </div>
             )}
             <div className="message">{message.message}</div>

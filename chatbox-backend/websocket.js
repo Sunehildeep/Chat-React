@@ -10,19 +10,28 @@ const io = new Server(server, {
   },
 });
 
+var users = {};
+
 io.on('connection', (socket) => {
   console.log('New WebSocket connection established');
 
   socket.on('joinRoom', (roomId) => {
     socket.join(roomId);
     console.log(`Socket ${socket.id} joined room ${roomId}`);
+    console.log(socket.rooms)
+  });
+
+  socket.on('connectId', (userId) => {
+    users[userId] = socket.id;
+    console.log(`Socket ${socket.id} connected with user id ${userId}`);
   });
 
   socket.on('message', (data) => {
     const { roomId, message } = data;
-    
+
     // Broadcast the message to all participants in the room
-    socket.to(roomId).emit('message', data);
+    io.sockets.in(roomId).emit('message', data);
+    io.sockets.in(roomId).emit('updateLastMessage', message);
     console.log(`Message received from ${socket.id} in room ${roomId}: ${message}`);
   });
 
@@ -34,6 +43,18 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('WebSocket connection closed');
   });
+
+  socket.on('refresh', (user1, user2) => {
+    console.log(`Refresh request received from ${socket.id} for users ${user1} and ${user2}`);
+
+    // Get the socket which has id == userId
+    const sender = io.sockets.sockets.get(users[user1]);
+    const receiver = io.sockets.sockets.get(users[user2]);
+
+    sender.emit('refresh');
+    receiver.emit('refresh');
+  });
+
 });
 
 server.listen(8000, () => {

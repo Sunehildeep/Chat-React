@@ -36,3 +36,12 @@ export const postMessage = async (id, sender, message) => {
         throw new Error('Failed to post conversation');
     }
 }
+
+export const startConvo = async (user1, user2, message) => {
+    try {
+        const response = await axios.post('http://localhost:5000/api/startConvo', { user1, user2, message });
+        return response.data;
+    } catch (error) {
+        throw new Error('Failed to start conversation');
+    }
+}
