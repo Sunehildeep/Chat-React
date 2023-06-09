@@ -1,0 +1,131 @@
+.conversation {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+  .conversation-header {
+    background-color: #2c3e50;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    color: #fff;
+  }
+  
+  .conversation-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .conversation-name {
+    font-size: 18px;
+    margin: 0;
+  }
+  
+  .conversation-body {
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(100% - 200px); /* Adjust the height based on your header and footer height */
+  }
+  
+  .conversation-footer {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-top: 1px solid #ccc;
+    position: sticky;
+    bottom: 0;
+  }
+
+  .conversation-body::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .conversation-body::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+  }
+  
+  .conversation-body::-webkit-scrollbar-track {
+    background-color: #f5f5f5;
+  }
+  
+  .conversation-message {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+  
+  .sender {
+    font-weight: bold;
+    margin-bottom: 4px;
+    text-align: right;
+  }
+
+  .receiver {
+    font-weight: bold;
+    margin-bottom: 4px;
+    text-align: left;
+  }
+  
+  .message {
+    padding: 8px;
+    border-radius: 4px;
+    display: inline-block;
+    max-width: 70%;
+  }
+  
+  .right .message {
+    background-color: #2c3e50;
+    color: #fff;
+    text-align: right;
+    align-self: flex-end;
+  }
+  
+  .left .message {
+    background-color: #f1f1f1;
+    color: #333;
+    text-align: left;
+    align-self: flex-start;
+  }
+  
+  .conversation-input {
+    flex-grow: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  .conversation-send {
+    background-color: #2c3e50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+  
+  .conversation-send:hover {
+    background-color: #1c2d40;
+  }
+  
+  .timestamp-left {
+    font-size: 0.8em;
+    color: #999;
+    margin-left: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .timestamp-right {
+    font-size: 0.8em;
+    color: #999;
+    margin-left: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }

@@ -1,0 +1,29 @@
+.convo-banner {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.convo-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.convo-info {
+    flex-grow: 1;
+}
+
+.convo-name {
+    font-size: 16px;
+    margin: 0;
+}
+
+.convo-last-message {
+    font-size: 14px;
+    margin: 0;
+    color: #777;
+}
