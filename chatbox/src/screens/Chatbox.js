@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { isAuthenticated } from '../actions/authenticationActions';
 
 const Chatbox = ({socket}) => {
-    const [selectedConversation, setSelectedConversation] = useState(null); 
+    const [selectedConversation, setSelectedConversation] = useState(JSON.parse(sessionStorage.getItem('selectedConversation')));
     const [conversations, setConversations] = useState();
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -21,6 +21,7 @@ const Chatbox = ({socket}) => {
 
     const handleConversationClick = (conversation) => {
         setSelectedConversation(conversation);
+        sessionStorage.setItem('selectedConversation', JSON.stringify(conversation));
     };
 
     useEffect(() => {
@@ -31,6 +32,7 @@ const Chatbox = ({socket}) => {
         // If socket emits refresh from backend, refresh the conversations list
         socket.on('refresh', () => {
             console.log('Refreshing conversations list');
+            
             loadConversations(userId);
         });
 
@@ -45,10 +47,20 @@ const Chatbox = ({socket}) => {
     const loadConversations = async (userId) => {
         try {
             const convos = await getConversationsList(userId);
-            console.log("Time is :", new Date().toLocaleTimeString());
-            console.log(convos);
+            console.log('convos:', convos);
+            console.log('selectedConversation:', selectedConversation);
+             // If selected convo is not null, then find the convo in convos and set it as selected
+            if (selectedConversation) {
+                const convo = convos.find((convo) => {
+                    return convo.id == selectedConversation.id;
+                });
+                console.log('Setting selected conversation to', convo);
+                setSelectedConversation(convo);
+            }
             setConversations(convos);
-            setFilteredUsers(convos)
+            setFilteredUsers(convos);
+           
+            
             setLoading(false);
         }
         catch (error) {
@@ -86,8 +98,6 @@ const Chatbox = ({socket}) => {
         if(filteredUsers.length == 0) setInfo('No results found')
         else setInfo('');
 
-        console.log(filteredUsers);
-
         // Check if the userId in filteredUsers is in conversations.user1 or conversations.user2
         // If it is, then replace that index in filteredUsers with the conversation object
         for (let i = 0; i < filteredUsers.length; i++) {
@@ -100,7 +110,6 @@ const Chatbox = ({socket}) => {
                 filteredUsers[i] = conversation;
             }
         }
-
         setFilteredUsers(filteredUsers);
     }
 
@@ -137,17 +146,20 @@ const Chatbox = ({socket}) => {
                 </div>
                 <div className="chatbox-body">
                     {/* Chat messages go here */}
-                    {selectedConversation ? (
+                    {selectedConversation != null ? (
                         <Conversation socket={socket} selectedConversation={selectedConversation} />
                     ) : (
                         <div className="chatbox-placeholder">Select a conversation</div>
                     )}
 
                 </div>
+                <form>
+
                 <div className="chatbox-footer">
                     <input type="text" className="chatbox-input" placeholder="Type your message..." />
-                    <button className="chatbox-send">Send</button>
+                    <button className="chatbox-send" type="submit">Send</button>
                 </div>
+                </form>
             </div>
         </div>
     );
