@@ -6,7 +6,7 @@ exports.getConversationsList = async (req, res, next) => {
     try {
         const id = req.params.id;
         const results = await query('SELECT c.user1, c.user2, c.id, u.name AS name, u.avatar, c.last_message AS last_message FROM conversations c INNER JOIN users u ON c.user2 = u.id \
-      WHERE c.user1 = ? UNION SELECT c.user1, c.user2, c.id, u.name AS name, u.avatar, c.last_message AS last_message FROM conversations c INNER JOIN users u ON c.user1 = u.id WHERE c.user2 = ?', [id, id]);
+      WHERE c.user1 = ? UNION SELECT c.user1, c.user2, c.id, u.name AS name, u.avatar, c.last_message AS last_message FROM conversations c INNER JOIN users u ON c.user1 = u.id WHERE c.user2 = ? ORDER BY id DESC', [id, id]);
         res.status(200).json(results);
     } catch (err) {
         console.log(err);

@@ -21,6 +21,7 @@ const Chatbox = ({socket}) => {
 
     const handleConversationClick = (conversation) => {
         setSelectedConversation(conversation);
+        console.log('Selected conversation:', conversation);
     };
 
     useEffect(() => {

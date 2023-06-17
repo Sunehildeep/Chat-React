@@ -28,7 +28,7 @@ const Conversation = ({ selectedConversation, socket }) => {
 			socket.emit("leaveRoom", selectedConversation.id);
 			console.log("Left room:", selectedConversation.id);
 		};
-	}, []);
+	}, [selectedConversation]);
 
 	useEffect(() => {
 		if (loading) return;
