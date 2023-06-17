@@ -9,7 +9,7 @@ router.get('/getAllUsers', controller.getAllUsers);
 router.get('/getConversationHistory/:id', controller.getConversationHistory);
 router.post('/postMessage', controller.postMessage);
 router.post('/startConvo', controller.startConvo);
-
+router.post('/updateMessage', controller.updateMessage);
 
 // Authentication
 router.post('/login', authController.login);

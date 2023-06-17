@@ -17,7 +17,6 @@ const Conversation = ({ selectedConversation, socket }) => {
 	const [message, setMessage] = useState("");
 
 	useEffect(() => {
-		getConvo();
 		setupWebSocket();
 
 		// Cleanup WebSocket connection when the component unmounts
@@ -26,8 +25,11 @@ const Conversation = ({ selectedConversation, socket }) => {
 			socket.off("message");
 			socket.off("connect");
 			socket.emit("leaveRoom", selectedConversation.id);
-			console.log("Left room:", selectedConversation.id);
 		};
+	}, [selectedConversation]);
+
+	useEffect(() => {
+		getConvo();
 	}, [selectedConversation]);
 
 	useEffect(() => {
@@ -95,6 +97,7 @@ const Conversation = ({ selectedConversation, socket }) => {
 			message: message,
 			time: new Date(),
 			roomId: selectedConversation.id,
+			is_read: 0,
 		};
 
 		await postMessage(selectedConversation.id, currentId, message);
@@ -124,9 +127,9 @@ const Conversation = ({ selectedConversation, socket }) => {
 				<h3 className="conversation-name">{selectedConversation.name}</h3>
 			</div>
 			<div className="conversation-body" id="convo-body">
-				<Messages messages={messages} currentUser={currentUser} />
+				<Messages socket={socket} user1={selectedConversation.user1} user2={selectedConversation.user2} id={selectedConversation.id} messages={messages} currentUser={currentUser} />
 			</div>
-			<div className="conversation-footer">
+			<form className="conversation-footer" onSubmit={(e) => {e.preventDefault();handleSendMessage(e)}}>
 				<input
 					type="text"
 					className="conversation-input"
@@ -134,10 +137,10 @@ const Conversation = ({ selectedConversation, socket }) => {
 					value={message}
 					onChange={(e) => setMessage(e.target.value)}
 				/>
-				<button className="conversation-send" onClick={handleSendMessage}>
+				<button className="conversation-send" type='submit'>
 					Send
 				</button>
-			</div>
+			</form>
 			<div className="conversation-characters">
 				{message.length}/300 characters
 				<br />
