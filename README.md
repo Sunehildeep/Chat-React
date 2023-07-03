@@ -2,6 +2,9 @@
 
 Chat-React is a real-time messaging application built with React that allows users to send private messages to each other. It provides a user-friendly interface and essential features for a seamless messaging experience.
 
+<img width="1162" alt="proj5" src="https://github.com/Sunehildeep/Chat---react/assets/23412507/2f54c492-927a-436c-97fa-2c87f7fc8063">
+
+
 ## Features
 
 - **Private Messaging:** Users can send private messages to each other, ensuring secure and confidential communication.
