@@ -42,6 +42,7 @@ const Conversation = ({ selectedConversation, socket }) => {
 		if (selectedConversation?.userId) {
 			// It means it is a new conversation
 			setIsNewConversation(true);
+			setMessages([]);
 		} else {
 			const history = await getConversationHistory(selectedConversation.id);
 			setMessages(history);

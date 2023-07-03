@@ -6,7 +6,6 @@ const ConvoBanner = ({ convo, onClick }) => {
 	const currentId = useSelector((state) => state.authentication?.user?.id);
 
     const { name, avatar, last_message, id, userId, user1, user2, is_read, last_sender } = convo;
-    console.log("ConvoBanner", last_sender);
     return (
         <div className="convo-banner" onClick={() => onClick({name, avatar, id, userId, user1, user2, is_read }) }>
             <img className="convo-avatar" src={avatar} alt={name} />

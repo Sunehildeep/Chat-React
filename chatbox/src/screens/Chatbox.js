@@ -21,8 +21,12 @@ const Chatbox = ({socket}) => {
 
     const handleConversationClick = (conversation) => {
         setSelectedConversation(conversation);
-        sessionStorage.setItem('selectedConversation', JSON.stringify(conversation));
+        console.log('Selected conversation:', conversation);
     };
+
+    useEffect(() => {
+        sessionStorage.setItem('selectedConversation', JSON.stringify(selectedConversation));
+    }, [selectedConversation]);
 
     useEffect(() => {
 
@@ -47,19 +51,11 @@ const Chatbox = ({socket}) => {
     const loadConversations = async (userId) => {
         try {
             const convos = await getConversationsList(userId);
-            console.log('convos:', convos);
-            console.log('selectedConversation:', selectedConversation);
-             // If selected convo is not null, then find the convo in convos and set it as selected
-            if (selectedConversation) {
-                const convo = convos.find((convo) => {
-                    return convo.id == selectedConversation.id;
-                });
-                console.log('Setting selected conversation to', convo);
-                setSelectedConversation(convo);
-            }
+            
             setConversations(convos);
             setFilteredUsers(convos);
-           
+            console.log('convos', selectedConversation)
+            console.log('convos', convos)
             
             setLoading(false);
         }

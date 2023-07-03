@@ -51,8 +51,15 @@ io.on('connection', (socket) => {
     const sender = io.sockets.sockets.get(users[user1]);
     const receiver = io.sockets.sockets.get(users[user2]);
 
-    sender.emit('refresh');
-    receiver.emit('refresh');
+    if (!sender || !receiver) {
+      console.log('Sender or receiver is null');
+      console.log('Sender:', sender);
+      console.log('Receiver:', receiver);
+      console.log('Users:', users);
+    }
+
+    if(sender) sender.emit('refresh');
+    if(receiver) receiver.emit('refresh');
   });
 
 });

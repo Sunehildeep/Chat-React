@@ -16,29 +16,27 @@ export default function MessageBox({
     user1,
     user2
 }) {
-	const { ref, inView } = useInView({ triggerOnce: true });
+	const { ref, inView } = useInView({ triggerOnce: false });
 	const currentId = useSelector((state) => state.authentication?.user?.id);
 
-	useEffect(() => {
-		if (!inView) return;
-		if (
-			!message.is_read &&
-			index === messageLength - 1 &&
-			currentUser != message.name
-		) {
-			markAsRead(message.message);
-		}
-	}, [inView]);
-
-	const markAsRead = (message) => {
-		updateMessage(id, message, true);
-		console.log("markAsRead");
+	const markAsRead = async (message) => {
+		await updateMessage(id, message, true);
         socket.emit(
 			"refresh",
 			user1,
 			user2
 		);
 	};
+
+	if (
+		!message.is_read &&
+		index === messageLength - 1 &&
+		currentUser != message.name &&
+		inView
+	) {
+		message.is_read = 1;
+		markAsRead(message.message);
+	}
 
 	return (
 		<div
