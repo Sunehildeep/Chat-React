@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
 import '../styles/authentication.css';
 import { connect, useSelector } from 'react-redux';
-import { isAuthenticated, login, register } from '../actions/authenticationActions';
+import { isAuthenticated, login, register, logoutUser } from '../actions/authenticationActions';
 
-const Authentication = ({ loginAction, registerAction }) => {
+const Authentication = ({ loginAction, registerAction, logoutAction, logout }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // if logout is true, logout
+  if (logout) {
+    logoutAction();
+  }
 
   // If user is logged in, redirect to chatbox
   if (isAuthenticated()) {
     window.location.href = '/chat';
     return null;
   }
+
 
   const handleLogin = async () => {
     try {
@@ -76,6 +82,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     loginAction: (email, password) => dispatch(login(email, password)),
     registerAction: (name, email, password) => dispatch(register(name, email, password)),
+    logoutAction: () => dispatch(logoutUser()),
   };
 };
 

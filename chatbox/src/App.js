@@ -18,6 +18,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Authentication />} />
             <Route path="/chat" element={<Chatbox socket={socket}/>} />
+            {/* Logout */}
+            <Route path="/logout" element={<Authentication logout={true}/>} />
           </Routes>
         </BrowserRouter>
       </>

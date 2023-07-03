@@ -10,7 +10,10 @@ const Header = () => {
         <div className="container">
           <h1 className="header-title">Welcome to Chatbox, {userName && userName}</h1>
           <p className="header-description">Start a conversation and connect with others</p>
+          {userName && <a href="/logout" className="logout">Logout</a>}
+
         </div>
+        
       </header>
     );
 };

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { loginSuccess, loginFailure, registerSuccess, registerFailure } from '../reducers/authenticationReducer';
+import { loginSuccess, loginFailure, registerSuccess, registerFailure, logout } from '../reducers/authenticationReducer';
 import { useSelector } from 'react-redux';
 
 export const login = (email, password) => {
@@ -15,6 +15,17 @@ export const login = (email, password) => {
     }
   };
 };
+
+export const logoutUser = () => {
+  return async (dispatch) => {
+    try {
+      dispatch(logout());
+      return true;
+    } catch (error) {
+      throw new Error('Failed to logout');
+    }
+  }
+}
 
 export const register = (name, email, password) => {
   return async (dispatch) => {
